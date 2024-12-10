@@ -11,7 +11,7 @@ RUN apt-get update \
 WORKDIR /src
 COPY --link nuget.config .
 COPY ["src/webapi/webapi.csproj", "src/webapi/"]
-RUN dotnet restore "src/webapi/webapi.csproj" -r linux-musl-$TARGETARCH
+RUN dotnet restore "src/webapi/webapi.csproj" -r linux-$TARGETARCH
 COPY . .
 WORKDIR "/src/src/webapi"
 RUN dotnet publish --no-restore "webapi.csproj"  -o /app/publish 
