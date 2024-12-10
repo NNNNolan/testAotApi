@@ -1,44 +1,27 @@
-# 基础参数定义
-ARG DOTNET_VERSION=9.0
-ARG LAUNCHING_FROM_VS
-ARG FINAL_BASE_IMAGE=${LAUNCHING_FROM_VS:+aotdebug}
+# 请参阅 https://aka.ms/customizecontainer 以了解如何自定义调试容器，以及 Visual Studio 如何使用此 Dockerfile 生成映像以更快地进行调试。
 
-# 基础阶段 - 用于开发调试
-FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS base
+# 此阶段用于在快速模式(默认为调试配置)下从 VS 运行时
+FROM mcr.microsoft.com/dotnet/nightly/runtime-deps:9.0-alpine-aot
+USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 
-# 构建阶段
-FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
-# 安装必要的依赖
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        clang \
-        zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
 
+# 此阶段用于生成服务项目
+FROM mcr.microsoft.com/dotnet/nightly/sdk:9.0-alpine-aot AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
-# 首先只复制项目文件并还原依赖
 COPY ["src/webapi/webapi.csproj", "src/webapi/"]
-RUN dotnet restore "./src/webapi/webapi.csproj"
-
-# 复制整个解决方案
+RUN dotnet restore "./src/webapi/webapi.csproj" -r linux-musl-$TARGETARCH
 COPY . .
 WORKDIR "/src/src/webapi"
+# RUN dotnet build "./webapi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# 构建项目
-RUN dotnet build "./webapi.csproj" \
-    -c $BUILD_CONFIGURATION \
-    -o /app/build
-
-# 发布阶段
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-# 发布为自包含应用，并启用 ReadyToRun 编译
-RUN dotnet publish "./webapi.csproj" \
-    -c $BUILD_CONFIGURATION \
+# 此阶段用于发布要复制到最终阶段的服务项目
+# FROM build AS publish
+# ARG BUILD_CONFIGURATION=Release
+# RUN dotnet publish "./webapi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false -c $BUILD_CONFIGURATION \
+RUN dotnet publish --no-restore "./webapi.csproj" \
     -o /app/publish \
     --self-contained true \
     -p:PublishSingleFile=true \
@@ -46,9 +29,10 @@ RUN dotnet publish "./webapi.csproj" \
     -p:UseAppHost=true \
     -p:EnableCompressionInSingleFile=true
 
-# 最终阶段 - 使用 runtime-deps
-FROM ${FINAL_BASE_IMAGE:-mcr.microsoft.com/dotnet/runtime-deps:9.0} AS final
+RUN rm /app/publish/*.dbg /app/publish/*.Development.json
+
+# 此阶段在生产中使用，或在常规模式下从 VS 运行时使用(在不使用调试配置时为默认值)
+FROM base AS final
 WORKDIR /app
-EXPOSE 8080
 COPY --from=publish /app/publish .
 ENTRYPOINT ["./webapi"]
