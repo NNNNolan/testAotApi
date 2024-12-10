@@ -25,6 +25,7 @@ todosApi.MapGet("/", () => sampleTodos);
 todosApi.MapGet("/AppData", async () => {
     try
     {
+        //0.0.1
         using HttpClient httpClient = new();
         using var response = await httpClient.GetAsync("https://www.cloudflare-cn.com/page-data/app-data.json");
         response.EnsureSuccessStatusCode();
