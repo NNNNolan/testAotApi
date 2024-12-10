@@ -20,8 +20,7 @@ WORKDIR "/src/src/webapi"
 # FROM build AS publish
 # ARG BUILD_CONFIGURATION=Release
 # RUN dotnet publish "./webapi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false -c $BUILD_CONFIGURATION \
-RUN dotnet publish --no-restore "./webapi.csproj" \ -c Release -r linux-musl-$TARGETARCH
-    -o /app/publish 
+RUN dotnet publish --no-restore "./webapi.csproj" \ -c Release -r linux-musl-$TARGETARCH  -o /app/publish 
 
 RUN rm /app/publish/*.dbg /app/publish/*.Development.json
 
