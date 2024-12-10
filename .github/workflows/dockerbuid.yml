@@ -16,18 +16,25 @@ jobs:
       
       - name: Get Version
         id: get_version
+        shell: bash # 明确指定使用 bash
         run: |
-          VERSION=$(git log -1 --pretty=%B | grep -oP '(?<=\[version:).*?(?=\])')
-          if [ -n "$VERSION" ]; then
-            echo "version=${VERSION}" >> $GITHUB_OUTPUT
-            echo "Found version: ${VERSION}"
-          else
-            # 使用北京时间作为版本号
-            DATE=$(TZ='Asia/Shanghai' date +'%Y%m%d.%H%M')
-            echo "version=${DATE}" >> $GITHUB_OUTPUT
-            echo "Using date as version: ${DATE}"
-          fi
-
+            # 首先尝试获取提交信息中的版本号
+            COMMIT_VERSION=$(git log -1 --pretty=%B | grep -oP '(?<=\[version:).*?(?=\])' || echo "")
+    
+            # 使用日期作为默认版本号
+            DATE_VERSION=$(TZ='Asia/Shanghai' date +'%Y%m%d.%H%M')
+    
+            # 如果找到提交中的版本号就用它，否则用日期
+            if [ -n "$COMMIT_VERSION" ]; then
+              VERSION="$COMMIT_VERSION"
+              echo "Found version tag: $VERSION"
+            else
+              VERSION="$DATE_VERSION"
+              echo "No version tag found, using date: $VERSION"
+            fi
+    
+            # 设置输出
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
       # 获取北京时间
       - name: Get Beijing time
         id: time
