@@ -42,34 +42,27 @@ jobs:
           echo "time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        id: buildx
+        uses: docker/setup-buildx-action@v1
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: nolanhzy/pro
-          tags: |
-            type=raw,value=latest
-            type=raw,value=${{ steps.get_version.outputs.version }}
 
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/pro:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/pro:${{steps.get_version.outputs.version}}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=registry,ref=nolanhzy/testaotapi:buildcache
-          cache-to: type=registry,ref=nolanhzy/testaotapi:buildcache,mode=max
 
       # 只在构建成功时发送 Telegram 通知
       - name: Send Telegram Message
