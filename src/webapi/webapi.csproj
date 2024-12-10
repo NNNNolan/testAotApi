@@ -6,10 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
 	<PublishAot>true</PublishAot>
-	<PublishReadyToRun>true</PublishReadyToRun>
-	<PublishTrimmed>true</PublishTrimmed>
-	<PublishSingleFile>true</PublishSingleFile>
-	<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>

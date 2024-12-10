@@ -15,12 +15,7 @@ WORKDIR "/src/src/webapi"
 # ARG BUILD_CONFIGURATION=Release
 # RUN dotnet publish "./webapi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false -c $BUILD_CONFIGURATION \
 RUN dotnet publish --no-restore "./webapi.csproj" \
-    -o /app/publish \
-    --self-contained true \
-    -p:PublishSingleFile=true \
-    -p:PublishTrimmed=true \
-    -p:UseAppHost=true \
-    -p:EnableCompressionInSingleFile=true
+    -o /app/publish 
 
 RUN rm /app/publish/*.dbg /app/publish/*.Development.json
 
