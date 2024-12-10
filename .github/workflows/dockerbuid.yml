@@ -60,8 +60,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/pro:latest
-            ${{ secrets.DOCKER_HUB_USERNAME }}/pro:${{steps.get_version.outputs.version}}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/testaotapi:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/testaotapi:${{steps.get_version.outputs.version}}
           platforms: linux/amd64,linux/arm64
 
       # 只在构建成功时发送 Telegram 通知
