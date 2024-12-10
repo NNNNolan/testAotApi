@@ -11,16 +11,10 @@ RUN apt-get update \
 WORKDIR /src
 COPY --link nuget.config .
 COPY ["src/webapi/webapi.csproj", "src/webapi/"]
-RUN dotnet restore "./src/webapi/webapi.csproj" -r linux-musl-$TARGETARCH
+RUN dotnet restore "src/webapi/webapi.csproj" -r linux-musl-$TARGETARCH
 COPY . .
 WORKDIR "/src/src/webapi"
-# RUN dotnet build "./webapi.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# 此阶段用于发布要复制到最终阶段的服务项目
-# FROM build AS publish
-# ARG BUILD_CONFIGURATION=Release
-# RUN dotnet publish "./webapi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false -c $BUILD_CONFIGURATION \
-RUN dotnet publish --no-restore "./webapi.csproj" \ -c Release -r linux-musl-$TARGETARCH  -o /app/publish 
+RUN dotnet publish --no-restore "webapi.csproj"  -o /app/publish 
 
 RUN rm /app/publish/*.dbg /app/publish/*.Development.json
 
