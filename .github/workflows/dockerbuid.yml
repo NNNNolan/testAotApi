@@ -68,8 +68,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           platforms: linux/amd64,linux/arm64/v8
-          cache-from: type=registry,ref=nolanhzy/testAotApi:buildcache
-          cache-to: type=registry,ref=nolanhzy/testAotApi:buildcache,mode=max
+          cache-from: type=registry,ref=nolanhzy/testaotapi:buildcache
+          cache-to: type=registry,ref=nolanhzy/testaotapi:buildcache,mode=max
 
       # 只在构建成功时发送 Telegram 通知
       - name: Send Telegram Message
@@ -82,7 +82,7 @@ jobs:
           message: |
             🎉 *Docker Build Success*
             
-            📦 *Image*: nolanhzy/testAotApi:${{ steps.get_version.outputs.version }}
+            📦 *Image*: nolanhzy/testaotapi:${{ steps.get_version.outputs.version }}
             👤 *By*: Nolan
             🕒 *Time*: ${{ steps.time.outputs.time }}
             
