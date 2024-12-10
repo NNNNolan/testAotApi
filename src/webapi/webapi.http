@@ -1,0 +1,11 @@
+@webapi_HostAddress = http://localhost:5016
+
+GET {{webapi_HostAddress}}/todos/
+Accept: application/json
+
+###
+
+GET {{webapi_HostAddress}}/todos/1
+Accept: application/json
+
+###
