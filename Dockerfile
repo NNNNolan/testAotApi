@@ -32,17 +32,15 @@ RUN if [ "${TARGETARCH}" = "${BUILDARCH}" ]; then \
 RUN rm /app/publish/*.dbg /app/publish/*.Development.json
 
 FROM alpine
-# 安装 tzdata 包并设置时区为上海
-RUN apk add --no-cache tzdata \
-    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "Asia/Shanghai" > /etc/timezone \
-    && apk del tzdata
-
 WORKDIR /app
 
 COPY --from=build-env /app/publish .
 USER $APP_UID
 ENV TZ=Asia/Shanghai
+RUN apk add tzdata \
+&& cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+&& echo "Asia/Shanghai" >  /etc/timezone \
+&& apk del tzdata
 WORKDIR /app
 EXPOSE 8080
 ENTRYPOINT ["./webapi"]
