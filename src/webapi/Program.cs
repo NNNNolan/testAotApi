@@ -19,7 +19,7 @@ var sampleTodos = new Todo[] {
     new(4, "Clean the bathroom"),
     new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
 };
-
+app.MapGet("/", () => Results.Text(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:ffff")));
 var todosApi = app.MapGroup("/todos");
 todosApi.MapGet("/", () => sampleTodos);
 todosApi.MapGet("/AppData", async () => {
@@ -55,6 +55,7 @@ public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplet
 [JsonSerializable(typeof(Todo[]))]
 [JsonSerializable(typeof(AppData[]))]
 [JsonSerializable(typeof(AppData))]
+[JsonSerializable(typeof(string))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
 
