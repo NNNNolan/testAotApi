@@ -35,12 +35,25 @@ FROM alpine
 WORKDIR /app
 
 COPY --from=build-env /app/publish .
-USER $APP_UID
+
 ENV TZ=Asia/Shanghai
 RUN apk add tzdata \
 && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 && echo "Asia/Shanghai" >  /etc/timezone \
 && apk del tzdata
-WORKDIR /app
+
+ENV TZ Asia/Shanghai
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache \
+      bash \
+      tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo Asia/Shanghai > /etc/timezone && \
+   && apk del tzdata  && \
+   rm -rf /var/cache/apk/* /tmp/*
+
+USER $APP_UID
 EXPOSE 8080
 ENTRYPOINT ["./webapi"]
