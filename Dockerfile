@@ -45,7 +45,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
       tzdata && \
      cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  &&\
     echo Asia/Shanghai > /etc/timezone && \
-   && apk del tzdata  && \
+    apk del tzdata  && \
    rm -rf /var/cache/apk/* /tmp/*
 
 USER $APP_UID
