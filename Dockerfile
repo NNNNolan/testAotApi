@@ -22,12 +22,13 @@ COPY ["src/webapi/webapi.csproj", "src/webapi/"]
 COPY . .
 WORKDIR "/src/src/webapi"
 
-RUN if [ "${TARGETARCH}" = "${BUILDARCH}" ]; then \
-      dotnet publish -f net9.0  "webapi.csproj" --use-current-runtime  -p:TargetFrameworks=net9.0 -o /app/publish; \
-    else \      
-      apk add binutils-aarch64 --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community; \
-      dotnet publish -f net9.0  "webapi.csproj" -r linux-musl-arm64  -p:TargetFrameworks=net9.0 -p:SysRoot=/crossrootfs/arm64 -p:ObjCopyName=aarch64-alpine-linux-musl-objcopy -o /app/publish; \
-    fi
+RUN if [ "${TARGETARCH}" = "${BUILDARCH}" ]; then \
+      dotnet publish -f net9.0  "webapi.csproj" --use-current-runtime  -p:TargetFrameworks=net9.0 -o /app/publish; \
+    else \
+      apk add binutils-aarch64 --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community; \
+      dotnet publish -f net9.0   "webapi.csproj" -r linux-musl-arm64  -p:TargetFrameworks=net9.0 -p:SysRoot=/crossrootfs/arm64 -p:ObjCopyName=aarch64-alpine-linux-musl-objcopy -o /app/publish; \
+    fi
+
 RUN rm /app/publish/*.dbg /app/publish/*.Development.json
 
 FROM alpine
